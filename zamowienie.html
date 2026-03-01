@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zamówienie – SkinForge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-orange: #FF6B00;
+    --neon-yellow: #FFD600;
+    --neon-red: #FF2D2D;
+    --bg: #080A0E;
+    --bg2: #0D1117;
+    --surface: #111820;
+    --border: rgba(255,107,0,0.25);
+    --text: #E8EDF5;
+    --muted: #5A6478;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: crosshair;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(8,10,14,0.95), transparent);
+    backdrop-filter: blur(4px);
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--neon-orange);
+    text-shadow: 0 0 20px rgba(255,107,0,0.6);
+    text-decoration: none;
+  }
+  .logo span { color: var(--neon-yellow); }
+
+  .back-btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--neon-orange); }
+
+  .page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 110px 20px 80px;
+    position: relative;
+  }
+
+  .page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,107,0,0.1) 0%, transparent 70%),
+      linear-gradient(rgba(255,107,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,0,0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 60px 60px, 60px 60px;
+    pointer-events: none;
+  }
+
+  .order-wrapper {
+    width: 100%;
+    max-width: 620px;
+    position: relative;
+  }
+
+  .order-header {
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--neon-orange);
+    margin-bottom: 12px;
+  }
+
+  .order-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 900;
+    line-height: 1.05;
+  }
+
+  .order-sub {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .step {
+    margin-bottom: 36px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .step-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #000;
+    background: var(--neon-orange);
+    width: 22px; height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .form-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+
+  .option { position: relative; }
+
+  .option input[type="radio"],
+  .option input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .option label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid rgba(255,107,0,0.1);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option label::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--neon-orange);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+
+  .option input:checked + label {
+    border-color: rgba(255,107,0,0.4);
+    background: linear-gradient(135deg, #111820, #0f1a24);
+    box-shadow: 0 0 16px rgba(255,107,0,0.08);
+  }
+
+  .option input:checked + label::before { transform: scaleX(1); }
+  .option label:hover { border-color: rgba(255,107,0,0.3); transform: translateX(3px); }
+
+  .opt-dot {
+    width: 16px; height: 16px;
+    border: 2px solid var(--muted);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .opt-check {
+    width: 16px; height: 16px;
+    border: 2px solid var(--muted);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .option input:checked + label .opt-dot,
+  .option input:checked + label .opt-check {
+    border-color: var(--neon-orange);
+    background: var(--neon-orange);
+    box-shadow: 0 0 8px rgba(255,107,0,0.5);
+  }
+
+  .opt-dot::after {
+    content: '';
+    width: 5px; height: 5px;
+    background: #000;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .opt-check::after {
+    content: '✓';
+    font-size: 0.65rem;
+    color: #000;
+    font-weight: 900;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .option input:checked + label .opt-dot::after,
+  .option input:checked + label .opt-check::after { opacity: 1; }
+
+  .opt-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .opt-info { flex: 1; }
+
+  .opt-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .opt-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-top: 2px;
+  }
+
+  .opt-price {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--neon-orange);
+    flex-shrink: 0;
+  }
+
+  .style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .market-option label { padding: 14px 18px; gap: 12px; }
+
+  .market-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  .budget-wrap { position: relative; }
+
+  .budget-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid rgba(255,107,0,0.15);
+    color: var(--text);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    padding: 18px 70px 18px 20px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  .budget-input:focus {
+    border-color: rgba(255,107,0,0.5);
+    box-shadow: 0 0 16px rgba(255,107,0,0.1);
+  }
+
+  .budget-input::placeholder { color: var(--muted); font-size: 1rem; }
+
+  .budget-currency {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--neon-orange);
+    letter-spacing: 2px;
+  }
+
+  .budget-presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .preset-btn {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid rgba(255,107,0,0.12);
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .preset-btn:hover {
+    color: var(--neon-orange);
+    border-color: var(--neon-orange);
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,107,0,0.2), transparent);
+    margin: 4px 0 36px;
+  }
+
+  .submit-area { margin-top: 8px; }
+
+  .submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    background: var(--neon-orange);
+    color: #000;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 18px 32px;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    transition: all 0.2s;
+  }
+
+  .submit-btn:hover {
+    background: var(--neon-yellow);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,107,0,0.4);
+  }
+
+  .submit-btn:disabled {
+    background: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .submit-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .success-box {
+    display: none;
+    text-align: center;
+    padding: 48px 32px;
+    background: var(--surface);
+    border: 1px solid rgba(255,107,0,0.3);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .success-icon { font-size: 3.5rem; margin-bottom: 20px; }
+
+  .success-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+    color: var(--neon-orange);
+  }
+
+  .success-summary {
+    background: rgba(255,107,0,0.06);
+    border: 1px solid rgba(255,107,0,0.15);
+    padding: 16px 20px;
+    margin: 0 auto 24px;
+    max-width: 420px;
+    text-align: left;
+    font-size: 0.82rem;
+    line-height: 2;
+    color: var(--text);
+  }
+
+  .success-summary strong {
+    color: var(--neon-orange);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .success-text {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .discord-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #5865F2;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 16px 40px;
+    text-decoration: none;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    transition: all 0.2s;
+  }
+
+  .discord-btn:hover {
+    background: #4752C4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(88,101,242,0.4);
+  }
+
+  /* COLOR PICKER */
+  .color-section { margin-top: 20px; }
+
+  .color-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .color-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .swatch {
+    width: 36px; height: 36px;
+    border: 2px solid rgba(255,107,0,0.15);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .swatch:hover { transform: scale(1.2); border-color: var(--neon-orange); }
+  .swatch.active { border-color: var(--neon-orange); box-shadow: 0 0 12px rgba(255,107,0,0.5); transform: scale(1.15); }
+
+  .swatch-custom {
+    background: var(--surface) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    overflow: hidden;
+  }
+
+  .swatch-custom input[type="color"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .color-chosen {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: var(--neon-orange);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-clear {
+    background: none;
+    border: 1px solid rgba(255,107,0,0.3);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    transition: all 0.2s;
+  }
+
+  .color-clear:hover { color: var(--neon-orange); border-color: var(--neon-orange); }
+
+  /* CS2INSPECT BANNER */
+  .inspect-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 14px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, rgba(255,107,0,0.06), rgba(255,107,0,0.02));
+    border: 1px solid rgba(255,107,0,0.2);
+    text-decoration: none;
+    color: var(--text);
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    transition: all 0.2s;
+  }
+
+  .inspect-banner:hover {
+    border-color: var(--neon-orange);
+    background: linear-gradient(135deg, rgba(255,107,0,0.12), rgba(255,107,0,0.05));
+    transform: translateX(3px);
+  }
+
+  .inspect-icon { font-size: 1.5rem; flex-shrink: 0; }
+
+  .inspect-info { flex: 1; }
+
+  .inspect-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--neon-orange);
+  }
+
+  .inspect-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .inspect-arrow {
+    font-size: 1.2rem;
+    color: var(--neon-orange);
+    flex-shrink: 0;
+  }
+
+  /* UNLIMITED BUDGET */
+  .unlimited-wrap { margin-bottom: 4px; }
+
+  .unlimited-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 12px 20px;
+    background: var(--surface);
+    border: 1px solid rgba(255,107,0,0.1);
+    transition: border-color 0.2s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+    width: 100%;
+  }
+
+  .unlimited-toggle:hover { border-color: rgba(255,107,0,0.3); }
+  .unlimited-toggle.active { border-color: rgba(255,214,0,0.4); background: linear-gradient(135deg, #111820, #14180f); }
+
+  .unlimited-toggle input { display: none; }
+
+  .toggle-slider {
+    width: 40px; height: 22px;
+    background: var(--muted);
+    border-radius: 11px;
+    position: relative;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: left 0.25s;
+  }
+
+  .unlimited-toggle.active .toggle-slider { background: var(--neon-yellow); }
+  .unlimited-toggle.active .toggle-slider::after { left: 21px; }
+
+  .toggle-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .unlimited-toggle.active .toggle-text { color: var(--neon-yellow); }
+
+  .unlimited-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(255,214,0,0.06), rgba(255,107,0,0.04));
+    border: 1px solid rgba(255,214,0,0.2);
+    margin-top: 14px;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 520px) {
+    nav { padding: 16px 20px; }
+    .style-grid, .market-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="strona-glowna.html" class="logo">SKIN<span>FORGE</span></a>
+  <a href="strona-glowna.html" class="back-btn">← Powrót</a>
+</nav>
+
+<div class="page">
+  <div class="order-wrapper">
+
+    <div class="order-header">
+      <div class="section-label">// Zamówienie</div>
+      <h1 class="order-title">ZŁÓŻ<br>ZAMÓWIENIE</h1>
+      <p class="order-sub">Wypełnij formularz – im więcej szczegółów, tym lepiej dobierzemy skiny. Po wysłaniu przeniesiemy Cię na Discord.</p>
+    </div>
+
+    <div id="formSection">
+
+      <!-- KROK 1: USŁUGA -->
+      <div class="step" style="animation-delay:0.05s">
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <span class="form-label">Wybierz usługę</span>
+        </div>
+        <div class="options-grid">
+          <div class="option">
+            <input type="radio" name="service" id="svc-skin" value="Dobór Skina – 20 zł">
+            <label for="svc-skin">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">🔫</div>
+              <div class="opt-info">
+                <div class="opt-name">Dobór Skina</div>
+                <div class="opt-desc">Jeden skin dopasowany do gustu i budżetu</div>
+              </div>
+              <div class="opt-price">20 zł</div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="service" id="svc-kit" value="Kit – 50 zł">
+            <label for="svc-kit">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">⚔️</div>
+              <div class="opt-info">
+                <div class="opt-name">Kit</div>
+                <div class="opt-desc">Agent + rękawice + nóż + pistolet + karabin</div>
+              </div>
+              <div class="opt-price">50 zł</div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="service" id="svc-loadout" value="Pełny Loadout – 100 zł">
+            <label for="svc-loadout">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">👑</div>
+              <div class="opt-info">
+                <div class="opt-name">Pełny Loadout</div>
+                <div class="opt-desc">Kompletny loadout na wszystkie sloty broni</div>
+              </div>
+              <div class="opt-price">100 zł</div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- KROK 2: STYL -->
+      <div class="step" style="animation-delay:0.15s">
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <span class="form-label">Styl skinów</span>
+        </div>
+        <div class="style-grid">
+          <div class="option">
+            <input type="radio" name="style" id="st-dark" value="Ciemny / mroczny">
+            <label for="st-dark">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">🖤</div>
+              <div class="opt-info">
+                <div class="opt-name">Ciemny</div>
+                <div class="opt-desc">Czarne, szare, mroczne</div>
+              </div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="style" id="st-color" value="Kolorowy / fade">
+            <label for="st-color">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">🌈</div>
+              <div class="opt-info">
+                <div class="opt-name">Kolorowy</div>
+                <div class="opt-desc">Jasne, fade, doppler</div>
+              </div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="style" id="st-minimal" value="Minimalistyczny">
+            <label for="st-minimal">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">⬜</div>
+              <div class="opt-info">
+                <div class="opt-name">Minimalistyczny</div>
+                <div class="opt-desc">Czyste, proste wzory</div>
+              </div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="style" id="st-rare" value="Prestiżowy / rzadki">
+            <label for="st-rare">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">💎</div>
+              <div class="opt-info">
+                <div class="opt-name">Prestiżowy</div>
+                <div class="opt-desc">Rzadkie, znane skiny</div>
+              </div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="style" id="st-match" value="Spójny kolorystycznie">
+            <label for="st-match">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">🎨</div>
+              <div class="opt-info">
+                <div class="opt-name">Spójny</div>
+                <div class="opt-desc">Jeden motyw kolorów</div>
+              </div>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="style" id="st-any" value="Zaskocz mnie">
+            <label for="st-any">
+              <div class="opt-dot"></div>
+              <div class="opt-icon">🎲</div>
+              <div class="opt-info">
+                <div class="opt-name">Zaskocz mnie</div>
+                <div class="opt-desc">Pełna dowolność</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- WYBÓR KOLORU -->
+        <div class="color-section" id="colorSection">
+          <div class="color-label">Preferowany kolor skinów <span style="color:var(--muted);font-weight:300;font-family:'Inter',sans-serif;text-transform:none;letter-spacing:0">(opcjonalne)</span></div>
+          <div class="color-swatches" id="colorSwatches">
+            <button class="swatch" style="background:#1a1a1a" data-color="Czarny" title="Czarny"></button>
+            <button class="swatch" style="background:#ffffff;border-color:rgba(255,255,255,0.3)" data-color="Biały" title="Biały"></button>
+            <button class="swatch" style="background:#c0c0c0" data-color="Srebrny" title="Srebrny"></button>
+            <button class="swatch" style="background:#cc2200" data-color="Czerwony" title="Czerwony"></button>
+            <button class="swatch" style="background:#0055cc" data-color="Niebieski" title="Niebieski"></button>
+            <button class="swatch" style="background:#009933" data-color="Zielony" title="Zielony"></button>
+            <button class="swatch" style="background:#FF6B00" data-color="Pomarańczowy" title="Pomarańczowy"></button>
+            <button class="swatch" style="background:#FFD600" data-color="Żółty" title="Żółty"></button>
+            <button class="swatch" style="background:#cc44cc" data-color="Fioletowy" title="Fioletowy"></button>
+            <button class="swatch" style="background:#00cccc" data-color="Niebieskozielony" title="Niebieskozielony"></button>
+            <button class="swatch" style="background:#cc6600" data-color="Złoty / brązowy" title="Złoty"></button>
+            <button class="swatch swatch-custom" data-color="custom" title="Własny kolor">
+              <input type="color" id="customColor" value="#ff6b00">
+              🎨
+            </button>
+          </div>
+          <div class="color-chosen" id="colorChosen" style="display:none">
+            Wybrany kolor: <span id="colorChosenName"></span>
+            <button class="color-clear" onclick="clearColor()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- KROK 3: BUDŻET -->
+      <div class="step" style="animation-delay:0.25s">
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <span class="form-label">Budżet na skiny</span>
+        </div>
+
+        <!-- Unlimited toggle -->
+        <div class="unlimited-wrap">
+          <label class="unlimited-toggle" id="unlimitedLabel">
+            <input type="checkbox" id="unlimitedCheck" onchange="toggleUnlimited()">
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Nieograniczony budżet 👑</span>
+          </label>
+        </div>
+
+        <div id="budgetFields">
+          <div class="budget-wrap" style="margin-top:14px">
+            <input type="number" class="budget-input" id="budget" placeholder="np. 500" min="0">
+            <span class="budget-currency">PLN</span>
+          </div>
+          <div class="budget-presets">
+            <button class="preset-btn" onclick="setBudget(100)">100 zł</button>
+            <button class="preset-btn" onclick="setBudget(250)">250 zł</button>
+            <button class="preset-btn" onclick="setBudget(500)">500 zł</button>
+            <button class="preset-btn" onclick="setBudget(1000)">1 000 zł</button>
+            <button class="preset-btn" onclick="setBudget(2500)">2 500 zł</button>
+            <button class="preset-btn" onclick="setBudget(5000)">5 000 zł</button>
+          </div>
+        </div>
+
+        <div id="budgetUnlimited" style="display:none">
+          <div class="unlimited-box">
+            <span style="font-size:2rem">👑</span>
+            <div>
+              <div style="font-family:'Orbitron',monospace;font-weight:700;color:var(--neon-yellow);font-size:1.1rem">NIEOGRANICZONY</div>
+              <div style="font-size:0.78rem;color:var(--muted);margin-top:4px">Dobierzemy najlepsze skiny bez limitu cenowego</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- KROK 4: MARKETPLACE -->
+      <div class="step" style="animation-delay:0.35s">
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <span class="form-label">Strona zakupu skinów (możesz wybrać kilka)</span>
+        </div>
+        <div class="market-grid">
+          <div class="option market-option">
+            <input type="checkbox" name="market" id="mk-pirate" value="PirateSwap">
+            <label for="mk-pirate">
+              <div class="opt-check"></div>
+              <div class="opt-icon">🏴‍☠️</div>
+              <div class="market-logo">PirateSwap</div>
+            </label>
+          </div>
+          <div class="option market-option">
+            <input type="checkbox" name="market" id="mk-skinland" value="Skin.land">
+            <label for="mk-skinland">
+              <div class="opt-check"></div>
+              <div class="opt-icon">🌍</div>
+              <div class="market-logo">Skin.land</div>
+            </label>
+          </div>
+          <div class="option market-option">
+            <input type="checkbox" name="market" id="mk-tradeit" value="Tradeit.gg">
+            <label for="mk-tradeit">
+              <div class="opt-check"></div>
+              <div class="opt-icon">🔄</div>
+              <div class="market-logo">Tradeit.gg</div>
+            </label>
+          </div>
+          <div class="option market-option">
+            <input type="checkbox" name="market" id="mk-shadowpay" value="Shadowpay">
+            <label for="mk-shadowpay">
+              <div class="opt-check"></div>
+              <div class="opt-icon">👤</div>
+              <div class="market-logo">Shadowpay</div>
+            </label>
+          </div>
+          <div class="option market-option">
+            <input type="checkbox" name="market" id="mk-csmonkey" value="CS.Monkey">
+            <label for="mk-csmonkey">
+              <div class="opt-check"></div>
+              <div class="opt-icon">🐒</div>
+              <div class="market-logo">CS.Monkey</div>
+            </label>
+          </div>
+          <div class="option market-option">
+            <input type="checkbox" name="market" id="mk-skinswap" value="Skinswap">
+            <label for="mk-skinswap">
+              <div class="opt-check"></div>
+              <div class="opt-icon">💱</div>
+              <div class="market-logo">Skinswap</div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+        <!-- CS2INSPECT BANNER -->
+        <a href="https://cs2inspect.com" target="_blank" class="inspect-banner">
+          <div class="inspect-icon">&#128269;</div>
+          <div class="inspect-info">
+            <div class="inspect-title">Oglu0105danie skinu00f3w 3D</div>
+            <div class="inspect-desc">Obejrzyj skin przed zakupem na cs2inspect.com</div>
+          </div>
+          <span class="inspect-arrow">&rarr;</span>
+        </a>
+
+      <div class="divider"></div>
+
+      <!-- SUBMIT -->
+      <div class="submit-area">
+        <button class="submit-btn" id="submitBtn" disabled onclick="handleSubmit()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.001.022.015.043.033.055A19.9 19.9 0 0 0 6.13 20.944a.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.032.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          Wyślij zamówienie na Discord
+        </button>
+        <p class="submit-note">Wymagane: usługa + budżet. Reszta opcjonalna ale bardzo pomocna!<br>Po kliknięciu zostaniesz przekierowany na nasz Discord.</p>
+      </div>
+
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-box" id="successBox">
+      <div class="success-icon">🎯</div>
+      <div class="success-title">ZAMÓWIENIE GOTOWE!</div>
+      <div class="success-summary" id="successSummary"></div>
+      <p class="success-text">Zaraz zostaniesz przeniesiony na Discord.<br>Pokaż nam te dane – odpiszemy w ciągu godziny!</p>
+      <a href="https://discord.gg/vvbcbYxY" class="discord-btn" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.001.022.015.043.033.055A19.9 19.9 0 0 0 6.13 20.944a.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.032.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Otwórz Discord
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const submitBtn = document.getElementById('submitBtn');
+  let selectedColor = null;
+  let isUnlimited = false;
+
+  // Auto-select service from URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const serviceParam = urlParams.get('service');
+  if (serviceParam) {
+    const map = { skin: 'svc-skin', kit: 'svc-kit', loadout: 'svc-loadout' };
+    const id = map[serviceParam];
+    if (id) {
+      const radio = document.getElementById(id);
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change'));
+        // Scroll to form smoothly
+        setTimeout(() => radio.closest('.step')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+      }
+    }
+  }
+
+  function checkForm() {
+    const service = document.querySelector('input[name="service"]:checked');
+    const budget = document.getElementById('budget').value;
+    submitBtn.disabled = !(service && (isUnlimited || (budget && parseInt(budget) > 0)));
+  }
+
+  document.querySelectorAll('input[name="service"]').forEach(r => r.addEventListener('change', checkForm));
+  document.getElementById('budget').addEventListener('input', checkForm);
+
+  function setBudget(val) {
+    document.getElementById('budget').value = val;
+    checkForm();
+  }
+
+  function toggleUnlimited() {
+    isUnlimited = document.getElementById('unlimitedCheck').checked;
+    const label = document.getElementById('unlimitedLabel');
+    const fields = document.getElementById('budgetFields');
+    const box = document.getElementById('budgetUnlimited');
+    label.classList.toggle('active', isUnlimited);
+    fields.style.display = isUnlimited ? 'none' : 'block';
+    box.style.display = isUnlimited ? 'block' : 'none';
+    checkForm();
+  }
+
+  // COLOR SWATCHES
+  document.querySelectorAll('.swatch').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      if (btn.dataset.color === 'custom') return; // handled by color input
+      e.preventDefault();
+      selectColor(btn.dataset.color, btn.style.background, btn);
+    });
+  });
+
+  document.getElementById('customColor').addEventListener('input', (e) => {
+    const hex = e.target.value;
+    const swatchBtn = e.target.closest('.swatch');
+    swatchBtn.style.background = hex;
+    selectColor('Własny: ' + hex, hex, swatchBtn);
+  });
+
+  function selectColor(name, bg, btn) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    selectedColor = name;
+    const chosen = document.getElementById('colorChosen');
+    const chosenName = document.getElementById('colorChosenName');
+    chosen.style.display = 'flex';
+    chosenName.innerHTML = `<span style="display:inline-block;width:14px;height:14px;background:${bg};border:1px solid rgba(255,255,255,0.2);vertical-align:middle;margin-right:6px"></span>${name}`;
+  }
+
+  function clearColor() {
+    selectedColor = null;
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    document.getElementById('colorChosen').style.display = 'none';
+  }
+
+  function handleSubmit() {
+    const service = document.querySelector('input[name="service"]:checked')?.value || '—';
+    const style   = document.querySelector('input[name="style"]:checked')?.value || 'Nie podano';
+    const budget  = isUnlimited ? 'NIEOGRANICZONY 👑' : parseInt(document.getElementById('budget').value).toLocaleString('pl-PL') + ' PLN';
+    const markets = [...document.querySelectorAll('input[name="market"]:checked')].map(c => c.value);
+    const color   = selectedColor || 'Nie podano';
+
+    document.getElementById('successSummary').innerHTML = `
+      <strong>Usługa:</strong> ${service}<br>
+      <strong>Styl:</strong> ${style}<br>
+      <strong>Kolor:</strong> ${color}<br>
+      <strong>Budżet:</strong> ${budget}<br>
+      <strong>Marketplace:</strong> ${markets.length ? markets.join(', ') : 'Nie podano'}
+    `;
+
+    document.getElementById('formSection').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+
+    setTimeout(() => window.open('https://discord.gg/vvbcbYxY', '_blank'), 1400);
+  }
+</script>
+</body>
+</html>
